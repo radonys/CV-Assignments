@@ -1,2 +1,2 @@
 # CV-Assignments
-Working repository for Computer Vision course 2018.
+Working repository for Computer Vision course - Spring 2018.
