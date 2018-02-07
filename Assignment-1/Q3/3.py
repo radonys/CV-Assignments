@@ -28,6 +28,7 @@ def laplacian_of_gaussian(image, min_sigma=1, max_sigma=50, num_sigma=10, k=2):
     image = image.astype(np.float64)
 
     sigma_values = np.linspace(min_sigma, max_sigma, num_sigma)
+    #sigma_values = np.array([2 ** i for i in range(0,10)])
 
     gaussian_laplace_images = [-gaussian_laplace(image, s) * s ** 2 for s in sigma_values]
     image_cube = np.dstack(gaussian_laplace_images)
@@ -50,9 +51,9 @@ def difference_of_gaussian(image, min_sigma=1, max_sigma=50, sigma_ratio=1.6):
     k = int(log(float(max_sigma) / min_sigma, sigma_ratio)) + 1
 
     # a geometric progression of standard deviations for gaussian kernels
-    sigma_list = np.array([min_sigma * (sigma_ratio ** i) for i in range(k + 1)])
+    sigma_values = np.array([min_sigma * (sigma_ratio ** i) for i in range(k + 1)])
 
-    gaussian_images = [gaussian_filter(image, s) for s in sigma_list]
+    gaussian_images = [gaussian_filter(image, s) for s in sigma_values]
 
     dog_images = [(gaussian_images[i] - gaussian_images[i + 1]) for i in range(k)]
     image_cube = np.dstack(dog_images)
@@ -63,7 +64,7 @@ def difference_of_gaussian(image, min_sigma=1, max_sigma=50, sigma_ratio=1.6):
         return np.empty((0,3))
    
     lm = local_maxima.astype(np.float64)
-    lm[:, 2] = sigma_list[local_maxima[:, 2]]
+    lm[:, 2] = sigma_values[local_maxima[:, 2]]
   
     return _prune_blobs(lm, .5)
 
