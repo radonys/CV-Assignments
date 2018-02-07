@@ -6,11 +6,23 @@ matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
 import matplotlib.image as img
 from math import sqrt, log
-from scipy.ndimage import gaussian_laplace, gaussian_filter
-from skimage.feature import peak_local_max, blob_dog
+from scipy.ndimage import gaussian_filter, generic_laplace
+from skimage.feature import peak_local_max
 from skimage.feature.blob import _prune_blobs
+import time
 
 #Functions
+def gaussian_laplace(input, sigma):
+    
+    input = np.asarray(input)
+
+    def derivative2(input, axis, output, mode, cval, *extra_arguments, **extra_keywords):
+        order = [0] * input.ndim
+        order[axis] = 2
+        return gaussian_filter(input, sigma, order)
+
+    return generic_laplace(input, derivative2, extra_arguments=(sigma,))
+
 def laplacian_of_gaussian(image, min_sigma=1, max_sigma=50, num_sigma=10, k=2):
     
     image = image.astype(np.float64)
@@ -58,15 +70,19 @@ def difference_of_gaussian(image, min_sigma=1, max_sigma=50, sigma_ratio=1.6):
 #Code
 image = cv2.imread('/Users/yashsrivastava/Documents/Files/CV-Assignments/Assignment-1/Images/Input/HW1_Q3/butterfly.jpg',0)
 
+start = time.time()
 blobs_log = laplacian_of_gaussian(image)
+end_log = str(time.time() - start)
 blobs_log[:, 2] = blobs_log[:, 2] * sqrt(2)
 
+start = time.time()
 blobs_dog = difference_of_gaussian(image, max_sigma=30)
+end_dog = str(time.time() - start)
 blobs_dog[:, 2] = blobs_dog[:, 2] * sqrt(2)
 
 blobs_list = [np.empty((0,3)),blobs_log, blobs_dog]
 colors = ['blue','red', 'yellow']
-titles = ['Original Image','Laplacian of Gaussian', 'Difference of Gaussian']
+titles = ['Original Image','Laplacian of Gaussian' + '\n Time Taken: ' + end_log , 'Difference of Gaussian' + '\n Time Taken: ' + end_dog]
 sequence = zip(blobs_list, colors, titles)
 
 fig, axes = plt.subplots(1, 3, figsize=(9, 3), sharex=True, sharey=True, subplot_kw={'adjustable': 'box-forced'})
