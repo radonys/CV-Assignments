@@ -50,7 +50,7 @@ def LowPassFilter(image,sd):
 def HighPassFilter(image,sd):
     
     n,m = image.shape
-    gaussian_matrix = 1 - gaussian_filter(n,m,sd)
+    gaussian_matrix = (1 - gaussian_filter(n,m,sd))
 
     dft = np.fft.fft2(image)
     dftshift = np.fft.fftshift(dft)
@@ -66,7 +66,7 @@ image1 = cv2.imread('/Users/yashsrivastava/Documents/Files/CV-Assignments/Assign
 image2 = cv2.imread('/Users/yashsrivastava/Documents/Files/CV-Assignments/Assignment-1/Images/Input/HW1_Q1/dog.bmp',0) #High Pass
 
 alpha = 50
-beta = 0.5
+beta = .5
 
 img1_low = LowPassFilter(image1,alpha)
 img2_high = HighPassFilter(image2,beta)
