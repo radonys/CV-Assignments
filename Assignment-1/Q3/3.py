@@ -23,7 +23,7 @@ def gaussian_laplace(input, sigma):
 
     return generic_laplace(input, derivative2, extra_arguments=(sigma,))
 
-def laplacian_of_gaussian(image, min_sigma=1, max_sigma=50, num_sigma=10, k=2):
+def laplacian_of_gaussian(image, min_sigma=1, max_sigma=15, num_sigma=10, k=2):
     
     image = image.astype(np.float64)
 
@@ -43,7 +43,7 @@ def laplacian_of_gaussian(image, min_sigma=1, max_sigma=50, num_sigma=10, k=2):
 
     return _prune_blobs(lm, .5)
 
-def difference_of_gaussian(image, min_sigma=1, max_sigma=50, sigma_ratio=1.6):
+def difference_of_gaussian(image, min_sigma=1, max_sigma=15, sigma_ratio=1.6):
 
     image = image.astype(np.float64)
 
