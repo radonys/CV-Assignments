@@ -114,14 +114,14 @@ if __name__=="__main__":
              [--method METHOD] [--alpha ALPHA] [--threshold THRESHOLD]
     """
     parser = argparse.ArgumentParser(description="Corner detection algorithms")
-    parser.add_argument('--image_path', type=str,
-                    help='Path to the image',default="chessboard.jpg")
+    parser.add_argument('--image_path',help='Path to the image',type=str,default="chessboard.png")
     parser.add_argument('--window_size',help='window size of filter',type=int,default=7)
     parser.add_argument('--method',help='Type of algo to be used (shitomasi,harris,both)',type=str,default="both")
     parser.add_argument('--alpha',help='Alpha value for Harris',type=float,default=0.002)
-    parser.add_argument('--threshold',help='threshold for cornerness score',type=float,default=0.0005)
-    args = parser.parse_args()# if R>0:
-            #     print(R)
+    parser.add_argument('--thresholdH',help='threshold for cornerness score in Harris Corner Detector',type=float,default=0.0005)
+    parser.add_argument('--thresholdS',help='threshold for cornerness score in Shi-Tomasi Corner Detector',type=float,default=0.01)
+    args = parser.parse_args()
+
     img = readimg(args.image_path)
     original = cv.imread(args.image_path,1)
     GAUSSIAN_KERNEL = gaussian_kernel(args.window_size)
@@ -129,10 +129,10 @@ if __name__=="__main__":
     coordinates_har = []
 
     if args.method.lower()=='both' or args.method.lower()=='shitomasi':
-        coordinates_shi = shiTomasi(img,args.window_size,args.threshold)
+        coordinates_shi = shiTomasi(img,args.window_size,args.thresholdS)
 
     if args.method.lower()=='both' or args.method.lower()=='harris':
-        coordinates_har = harris(img,args.window_size,args.alpha,args.threshold)
+        coordinates_har = harris(img,args.window_size,args.alpha,args.thresholdH)
 
     if args.method.lower()=='both':
         fig, (ax1, ax2, ax3) = plt.subplots(1,3)
@@ -141,9 +141,11 @@ if __name__=="__main__":
         ax2.imshow(original)
         ax2.plot(coordinates_shi[0],coordinates_shi[1],'.', color='firebrick')
         ax2.set_title("Shi-Tomasi Corner Detection")
+        ax2.set_xlabel("Threshold: "+str(args.thresholdS))
         ax3.imshow(original)
         ax3.plot(coordinates_har[0],coordinates_har[1],'.', color='firebrick')
         ax3.set_title("Harris Corner Detection")
+        ax3.set_xlabel("Threshold: "+str(args.thresholdH)+"\nAlpha: "+str(args.alpha))
 
     elif args.method.lower()=='harris':
         fig, (ax1, ax2) = plt.subplots(1,2)
@@ -152,6 +154,7 @@ if __name__=="__main__":
         ax2.imshow(original)
         ax2.plot(coordinates_har[0],coordinates_har[1],'.', color='firebrick')
         ax2.set_title("Harris Corner Detection")
+        ax2.set_xlabel("Threshold: "+str(args.thresholdH)+"\nAlpha: "+str(args.alpha))
 
     elif args.method.lower()=="shitomasi":
         fig, (ax1, ax2) = plt.subplots(1,2)
@@ -160,6 +163,7 @@ if __name__=="__main__":
         ax2.imshow(original)
         ax2.plot(coordinates_shi[0],coordinates_shi[1],'.', color='firebrick')
         ax2.set_title("Shi-Tomasi Corner Detection")
+        ax2.set_xlabel("Threshold: "+str(args.thresholdS))
     else:
         parser.print_help()
         print("Please enter the appropriate option")
