@@ -39,10 +39,12 @@ def training_features(kmeans):
     labels_features = []
     for i in os.listdir("../Data/train_sift_features"):
         raw_data = np.loadtxt(open("../Data/train_sift_features/"+i),delimiter=",")
-        labels_features.append(labels_training[i.split("_")[0]-1])
+        labels_features.append(labels_training[int(i.split("_")[0])-1])
         image_features = [0 for i in range(kmeans.n_clusters)]
         while len(raw_data):
-            image_features[np.argmin(np.sum(np.square(kmeans.cluster_centers_-np.delete(raw_data,0,0),1)))]+=1
+            y=raw_data[0]
+            raw_data = np.delete(raw_data,0,0)
+            image_features[np.argmin(np.sum(np.square(kmeans.cluster_centers_-y,1)))]+=1
         data.append(image_features)
     pickle.dump(data,open("training_features.pkl","wb"))
     pickle.dump(labels_features,open("labels_training_features.pkl","wb"))
@@ -52,10 +54,12 @@ def test_features(kmeans):
     labels_features = []
     for i in os.listdir("../Data/test_sift_features"):
         raw_data = np.loadtxt(open("../Data/test_sift_features/"+i),delimiter=",")
-        labels_features.append(labels_training[i.split("_")[0]-1])
+        labels_features.append(labels_training[int(i.split("_")[0])-1])
         image_features = [0 for i in range(kmeans.n_clusters)]
         while len(raw_data):
-            image_features[np.argmin(np.sum(np.square(kmeans.cluster_centers_-np.delete(raw_data,0,0),1)))]+=1
+            y=raw_data[0]
+            raw_data = np.delete(raw_data,0,0)
+            image_features[np.argmin(np.sum(np.square(kmeans.cluster_centers_-y,1)))]+=1
         data.append(image_features)
     pickle.dump(data,open("test_features.pkl","wb"))
     pickle.dump(labels_features,open("labels_test_features.pkl","wb"))

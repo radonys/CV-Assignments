@@ -84,6 +84,11 @@ def train_model(model, criterion, optimizer, scheduler, dataloaders, dataset_siz
                 best_acc = epoch_acc
                 best_model_wts = copy.deepcopy(model.state_dict())
 
+                if not os.path.isdir('checkpoint'):
+                    os.mkdir('checkpoint')
+                save_point = 'checkpoint/'
+                torch.save(state, save_point+"alexnet_best"+'.t7')
+                
         print()
 
     time_elapsed = time.time() - since

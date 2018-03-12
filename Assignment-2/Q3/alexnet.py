@@ -17,7 +17,23 @@ from tensorboardX import SummaryWriter
 from modules import train_model
 
 data_dir = '/home/yash/hw2_data'
-image_datasets = {x: datasets.ImageFolder(os.path.join(data_dir, x)) for x in ['trainf', 'testf']}
+
+data_transforms = {
+    'trainf': transforms.Compose([
+        transforms.RandomResizedCrop(224),
+        transforms.RandomHorizontalFlip(),
+        transforms.ToTensor(),
+        transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
+    ]),
+    'testf': transforms.Compose([
+        transforms.Resize(256),
+        transforms.CenterCrop(224),
+        transforms.ToTensor(),
+        transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
+    ]),
+}
+
+image_datasets = {x: datasets.ImageFolder(os.path.join(data_dir, x), data_transforms[x]) for x in ['trainf', 'testf']}
 dataloaders = {x: torch.utils.data.DataLoader(image_datasets[x], batch_size=4, shuffle=True, num_workers=1) for x in ['trainf', 'testf']}
 dataset_sizes = {x: len(image_datasets[x]) for x in ['trainf', 'testf']}
 class_names = image_datasets['trainf'].classes
@@ -31,8 +47,11 @@ for param in model.parameters():
     param.requires_grad = False
 #Parameters of newly constructed modules have requires_grad=True by default
 
-num_ftrs = model.fc.in_features
-model.fc = nn.Linear(num_ftrs, 8)
+num_ftrs = model.classifier[6].in_features
+feature_model = list(model.classifier.children())
+feature_model.pop()
+feature_model.append(nn.Linear(num_ftrs, 8))
+model.classifier = nn.Sequential(*feature_model)
 
 if use_gpu:
     model = model.cuda()
@@ -40,7 +59,9 @@ if use_gpu:
 criterion = nn.CrossEntropyLoss()
 
 #Only parameters of final layer are being optimized.
-optimizer_conv = optim.SGD(model.fc.parameters(), lr=0.001, momentum=0.9)
+feature_model = list(model.classifier.children())
+w = feature_model[len(feature_model)-1]
+optimizer_conv = optim.SGD(w.parameters(), lr=0.001, momentum=0.9)
 
 # Decay LR by a factor of 0.1 every 7 epochs
 exp_lr_scheduler = lr_scheduler.StepLR(optimizer_conv, step_size=7, gamma=0.1)
@@ -55,6 +76,7 @@ i = 1
 for data in dataloaders['testf']:
     
     images, labels = data
+    images, labels = images.cuda(), labels.cuda()
     outputs = model_trained(Variable(images))
     _, predicted = torch.max(outputs.data, 1)
     total += labels.size(0)
