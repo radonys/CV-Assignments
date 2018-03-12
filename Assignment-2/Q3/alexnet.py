@@ -17,7 +17,23 @@ from tensorboardX import SummaryWriter
 from modules import train_model
 
 data_dir = '/home/yash/hw2_data'
-image_datasets = {x: datasets.ImageFolder(os.path.join(data_dir, x)) for x in ['trainf', 'testf']}
+
+data_transforms = {
+    'trainf': transforms.Compose([
+        transforms.RandomResizedCrop(224),
+        transforms.RandomHorizontalFlip(),
+        transforms.ToTensor(),
+        transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
+    ]),
+    'testf': transforms.Compose([
+        transforms.Resize(256),
+        transforms.CenterCrop(224),
+        transforms.ToTensor(),
+        transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
+    ]),
+}
+
+image_datasets = {x: datasets.ImageFolder(os.path.join(data_dir, x), data_transforms[x]) for x in ['trainf', 'testf']}
 dataloaders = {x: torch.utils.data.DataLoader(image_datasets[x], batch_size=4, shuffle=True, num_workers=1) for x in ['trainf', 'testf']}
 dataset_sizes = {x: len(image_datasets[x]) for x in ['trainf', 'testf']}
 class_names = image_datasets['trainf'].classes
