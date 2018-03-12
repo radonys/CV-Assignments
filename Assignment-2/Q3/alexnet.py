@@ -76,6 +76,7 @@ i = 1
 for data in dataloaders['testf']:
     
     images, labels = data
+    images, labels = images.cuda(), labels.cuda()
     outputs = model_trained(Variable(images))
     _, predicted = torch.max(outputs.data, 1)
     total += labels.size(0)
