@@ -31,8 +31,11 @@ for param in model.parameters():
     param.requires_grad = False
 #Parameters of newly constructed modules have requires_grad=True by default
 
-num_ftrs = model.fc.in_features
-model.fc = nn.Linear(num_ftrs, 8)
+num_ftrs = model.classifier[6].in_features
+feature_model = list(model.classifier.children())
+feature_model.pop()
+feature_model.append(nn.Linear(num_ftrs, 8))
+model.classifier = nn.Sequential(*feature_model)
 
 if use_gpu:
     model = model.cuda()
