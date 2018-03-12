@@ -43,7 +43,9 @@ if use_gpu:
 criterion = nn.CrossEntropyLoss()
 
 #Only parameters of final layer are being optimized.
-optimizer_conv = optim.SGD(model.fc.parameters(), lr=0.001, momentum=0.9)
+feature_model = list(model.classifier.children())
+w = feature_model[len(feature_model)-1]
+optimizer_conv = optim.SGD(w.parameters(), lr=0.001, momentum=0.9)
 
 # Decay LR by a factor of 0.1 every 7 epochs
 exp_lr_scheduler = lr_scheduler.StepLR(optimizer_conv, step_size=7, gamma=0.1)
