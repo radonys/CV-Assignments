@@ -46,7 +46,7 @@ def training_features(kmeans):
         while len(raw_data):
             y=raw_data[0]
             raw_data = np.delete(raw_data,0,0)
-            image_features[np.argmin(np.sum(np.square(kmeans.cluster_centers_-y)))]+=1
+            image_features[np.argmin(np.sum(np.square(kmeans.cluster_centers_-y),1))]+=1
         data.append(image_features)
     pickle.dump(data,open("training_features.pkl","wb"))
     pickle.dump(labels_features,open("labels_training_features.pkl","wb"))
@@ -61,7 +61,7 @@ def test_features(kmeans):
         while len(raw_data):
             y=raw_data[0]
             raw_data = np.delete(raw_data,0,0)
-            image_features[np.argmin(np.sum(np.square(kmeans.cluster_centers_-y)))]+=1
+            image_features[np.argmin(np.sum(np.square(kmeans.cluster_centers_-y),1))]+=1
         data.append(image_features)
     pickle.dump(data,open("test_features.pkl","wb"))
     pickle.dump(labels_features,open("labels_test_features.pkl","wb"))
