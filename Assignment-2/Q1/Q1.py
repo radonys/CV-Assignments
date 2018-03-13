@@ -3,25 +3,34 @@ import os
 import heapq
 import pickle
 from sklearn.cluster import KMeans
-class cus_heap():
-    def __init__(self,data=[]):
-        self.data = data
-        self.heapify()
-    def heapify(self):
-        heapq.heapify(self.data)
-    def push(self,ele):
-        heap.heappush(self.data,ele)
-    def pop(self):
-        return heap.heappop(self.data)
-    def nsmallest(self,n):
-        return heap.nsmallest(self.data,n)
-    def reinit():
-        self.data = []
+# class cus_heap():
+#     def __init__(self,data=[]):
+#         self.data = data
+#         self.heapify()
+#     def heapify(self):
+#         heapq.heapify(self.data)
+#     def push(self,ele):
+#         heap.heappush(self.data,ele)
+#     def pop(self):
+#         return heap.heappop(self.data)
+#     def nsmallest(self,n):
+#         return heap.nsmallest(self.data,n)
+#     def reinit():
+#         self.data = []
 N = 9
 labels_training = np.loadtxt(open("../Data/train_labels.csv"),delimiter=',')
 labels_testing = np.loadtxt(open("../Data/test_labels.csv"),delimiter=',')
 acc = 0
 count = 0
+
+def knn(testing,training,k,label_test,label_train):
+    acc = 0.0
+    for index,feature in enumerate(testing):
+        distance = np.sqrt(np.sum(np.square(np.subtract(training,feature)),1))
+        predictions = [ i[1] for i in heapq.nsmallest(k,list(np.append(distance,labels_training.T,1))) ]
+        if max(set(predictions),key=predictions.count) == label_test[index]:
+            acc+=1
+    print("Accuracy: {}%".format(100*acc/index))
 
 def kmeans(K):
     main_data = np.array([])
@@ -66,8 +75,14 @@ def test_features(kmeans):
     pickle.dump(data,open("test_features.pkl","wb"))
     pickle.dump(labels_features,open("labels_test_features.pkl","wb"))
 if __name__ == "__main__":
-    km = pickle.load(open("k-means.pkl","rb"))
-    print("Generating Test Features")
-    test_features(km)
-    print("Generating Training Features")
-    training_features(km)
+    label_test = np.array(pickle.load(open("labels_test_features.pkl","rb")))
+    label_train = np.array(pickle.load(open("labels_training_features.pkl","rb")))
+    training = pickle.load(open("training_features.pkl","rb"))
+    testing = pickle.load(open("test_features.pkl","rb"))
+    print("Started KNN")
+    knn(testing,training,9,label_test,label_train)
+    # km = pickle.load(open("k-means.pkl","rb"))
+    # print("Generating Test Features")
+    # test_features(km)
+    # print("Generating Training Features")
+    # training_features(km)
