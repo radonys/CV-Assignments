@@ -28,9 +28,9 @@ def kmeans(K):
     print("Appending features")
     for i in os.listdir("../Data/train_sift_features"):
         if len(main_data):
-            main_data = np.vstack((main_data,np.loadtxt(open("../Data/train_sift_features/"+i),delimiter=",")))
+            main_data = np.vstack((main_data,np.loadtxt(open("../Data/train_sift_features/"+i),delimiter=",")[:,4:]))
         else:
-            main_data = np.loadtxt(open("../Data/train_sift_features/"+i),delimiter=",")
+            main_data = np.loadtxt(open("../Data/train_sift_features/"+i),delimiter=",")[:,4:]
     print(main_data.shape)
     print("Starting Clustering")
     t = KMeans(n_clusters=K).fit(main_data)
@@ -40,7 +40,7 @@ def training_features(kmeans):
     data = []
     labels_features = []
     for i in os.listdir("../Data/train_sift_features"):
-        raw_data = np.loadtxt(open("../Data/train_sift_features/"+i),delimiter=",")
+        raw_data = np.loadtxt(open("../Data/train_sift_features/"+i),delimiter=",")[:,4:]
         labels_features.append(labels_training[int(i.split("_")[0])-1])
         image_features = [0 for i in range(kmeans.n_clusters)]
         while len(raw_data):
@@ -55,7 +55,7 @@ def test_features(kmeans):
     data = []
     labels_features = []
     for i in os.listdir("../Data/test_sift_features"):
-        raw_data = np.loadtxt(open("../Data/test_sift_features/"+i),delimiter=",")
+        raw_data = np.loadtxt(open("../Data/test_sift_features/"+i),delimiter=",")[:,4:]
         labels_features.append(labels_testing[int(i.split("_")[0])-1])
         image_features = [0 for i in range(kmeans.n_clusters)]
         while len(raw_data):
