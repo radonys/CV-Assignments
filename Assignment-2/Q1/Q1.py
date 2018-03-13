@@ -61,7 +61,7 @@ def kmeans(K,path):
     print(main_data.shape)
     print("Starting Clustering")
     t = KMeans(n_clusters=K).fit(main_data)
-    pickle.dump(t,open("{}-means.pkl".format(k),"wb"))
+    pickle.dump(t,open("{}-means.pkl".format(K),"wb"))
     return t
 
 def training_features(kmeans,path,labels_training):
@@ -76,8 +76,8 @@ def training_features(kmeans,path,labels_training):
             raw_data = np.delete(raw_data,0,0)
             image_features[np.argmin(np.sqrt(np.sum(np.square(kmeans.cluster_centers_-y),1)))]+=1
         data.append(image_features)
-    pickle.dump(data,open("training_features.pkl","wb"))
-    pickle.dump(labels_features,open("labels_training_features.pkl","wb"))
+    pickle.dump(data,open("training_features{}.pkl".format(kmeans.cluster_centers_.shape[0]),"wb"))
+    pickle.dump(labels_features,open("labels_training_features_{}.pkl".format(kmeans.cluster_centers_.shape[0]),"wb"))
 
 def test_features(kmeans,path,labels_testing):
     data = []
@@ -91,7 +91,7 @@ def test_features(kmeans,path,labels_testing):
             raw_data = np.delete(raw_data,0,0)
             image_features[np.argmin(np.sqrt(np.sum(np.square(kmeans.cluster_centers_-y),1)))]+=1
         data.append(image_features)
-    pickle.dump(data,open("test_features{}.pkl".format(kmeans.cluster_centers_[0].shape[0]),"wb"))
+    pickle.dump(data,open("test_features{}.pkl".format(kmeans.cluster_centers_.shape[0]),"wb"))
     pickle.dump(labels_features,open("labels_test_features{}.pkl".format(kmeans.cluster_centers_[0].shape[0]),"wb"))
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Classification Using Knn and Bag Of Visual Words',prog='Q1.py')
@@ -167,4 +167,3 @@ if __name__ == "__main__":
     # test_features(km)
     # print("Generating Training Features")
     # training_features(km)
-
