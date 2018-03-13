@@ -55,7 +55,7 @@ def training_features(kmeans):
         while len(raw_data):
             y=raw_data[0]
             raw_data = np.delete(raw_data,0,0)
-            image_features[np.argmin(np.sum(np.square(kmeans.cluster_centers_-y),1))]+=1
+            image_features[np.argmin(np.sqrt(np.sum(np.square(kmeans.cluster_centers_-y),1)))]+=1
         data.append(image_features)
     pickle.dump(data,open("training_features.pkl","wb"))
     pickle.dump(labels_features,open("labels_training_features.pkl","wb"))
@@ -70,19 +70,20 @@ def test_features(kmeans):
         while len(raw_data):
             y=raw_data[0]
             raw_data = np.delete(raw_data,0,0)
-            image_features[np.argmin(np.sum(np.square(kmeans.cluster_centers_-y),1))]+=1
+            image_features[np.argmin(np.sqrt(np.sum(np.square(kmeans.cluster_centers_-y),1)))]+=1
         data.append(image_features)
     pickle.dump(data,open("test_features.pkl","wb"))
     pickle.dump(labels_features,open("labels_test_features.pkl","wb"))
 if __name__ == "__main__":
-    label_test = np.array(pickle.load(open("labels_test_features.pkl","rb")))
-    label_train = np.array(pickle.load(open("labels_training_features.pkl","rb")))
-    training = pickle.load(open("training_features.pkl","rb"))
-    testing = pickle.load(open("test_features.pkl","rb"))
-    print("Started KNN")
-    knn(testing,training,9,label_test,label_train)
-    # km = pickle.load(open("k-means.pkl","rb"))
-    # print("Generating Test Features")
-    # test_features(km)
-    # print("Generating Training Features")
-    # training_features(km)
+    # label_test = np.array(pickle.load(open("labels_test_features.pkl","rb")))
+    # label_train = np.array(pickle.load(open("labels_training_features.pkl","rb")))
+    # training = pickle.load(open("training_features.pkl","rb"))
+    # testing = pickle.load(open("test_features.pkl","rb"))
+    # print("Started KNN")
+    # knn(testing,training,9,label_test,label_train)
+    km = pickle.load(open("k-means.pkl","rb"))
+    print("Generating Test Features")
+    test_features(km)
+    print("Generating Training Features")
+    training_features(km)
+
