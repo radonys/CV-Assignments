@@ -61,7 +61,7 @@ def kmeans(K,path):
     print(main_data.shape)
     print("Starting Clustering")
     t = KMeans(n_clusters=K).fit(main_data)
-    pickle.dump(t,open("{}-means.pkl".format(k),"wb"))
+    pickle.dump(t,open("{}-means.pkl".format(K),"wb"))
     return t
 
 def training_features(kmeans,path,labels_training):
