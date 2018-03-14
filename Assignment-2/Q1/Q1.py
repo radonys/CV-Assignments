@@ -99,7 +99,7 @@ if __name__ == "__main__":
     1)Kmeans bag of words Generation and feature Generation\n
     2)Cross validation in Kfolds\n
     3)Classification using KNN
-    """,choices=[1,2,3],default=1)
+    """,choices=[1,2,3,4],default=1)
     parser.add_argument('--k',type=int,help="K for KMeans, KNN or Kfolds (compulsary)")
     parser.add_argument("--train_data_path",type=str,help="Path to train folder/pkl",default="../Data/train_sift_features")
     parser.add_argument("--test_data_path",type=str,help="Path to test folder/pkl",default="../Data/test_sift_features")
@@ -153,6 +153,17 @@ if __name__ == "__main__":
         print("Please provide proper options")
         args.print_help()
         sys.exit()
+    elif args.mode == 4:
+        for i in os.listdir("./"):
+            if i.endswith(".pkl"):
+                kmean = pickle.load(open(i,"rb"))
+                label_test = np.array(pickle.load(open(args.test_label_path,"rb")))
+                label_train = np.array(pickle.load(open(args.train_label_path,"rb")))
+                print("Geneating training features and label")
+                training_features(kmean,args.train_data_path,labels_training)
+                print("Geneating test features and label")
+                test_features(kmean,args.test_data_path,labels_testing)
+
     # label_test = np.array(pickle.load(open("labels_test_features.pkl","rb")))
     # label_train = np.array(pickle.load(open("labels_training_features.pkl","rb")))
     # training = np.array(pickle.load(open("training_features.pkl","rb")))
