@@ -38,7 +38,7 @@ dataloaders = {x: torch.utils.data.DataLoader(image_datasets[x], batch_size=4, s
 dataset_sizes = {x: len(image_datasets[x]) for x in ['trainf', 'testf']}
 class_names = image_datasets['trainf'].classes
 
-writer = SummaryWriter()
+writer1 = SummaryWriter()
 use_gpu = torch.cuda.is_available()
 model = torchvision.models.alexnet(pretrained=True)
 
@@ -66,7 +66,7 @@ optimizer_conv = optim.SGD(w.parameters(), lr=0.001, momentum=0.9)
 # Decay LR by a factor of 0.1 every 7 epochs
 exp_lr_scheduler = lr_scheduler.StepLR(optimizer_conv, step_size=7, gamma=0.1)
 
-model_trained = train_model(model, criterion, optimizer_conv, exp_lr_scheduler, dataloaders, dataset_sizes, 25)
+model_trained = train_model(model, criterion, optimizer_conv, exp_lr_scheduler, dataloaders, dataset_sizes, writer1, 50)
 
 #Testing the trained network
 correct = 0
@@ -81,7 +81,7 @@ for data in dataloaders['testf']:
     _, predicted = torch.max(outputs.data, 1)
     total += labels.size(0)
     correct += (predicted == labels).sum()
-    writer.add_scalar('data/Test_Accuracy', (correct/total) * 100, i)
+    writer1.add_scalar('data/Test_Accuracy', (correct/total) * 100, i)
     i = i + 1
 
 print('Accuracy of the network on the 800 test images: %d %%' % (100 * correct / total))

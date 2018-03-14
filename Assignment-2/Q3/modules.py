@@ -13,11 +13,10 @@ import time
 import os
 import copy
 from tensorboardX import SummaryWriter
-writer = SummaryWriter()
 
 use_gpu = torch.cuda.is_available()
 
-def train_model(model, criterion, optimizer, scheduler, dataloaders, dataset_sizes, num_epochs=25):
+def train_model(model, criterion, optimizer, scheduler, dataloaders, dataset_sizes, writer, num_epochs=25):
     
     since = time.time()
 
@@ -80,9 +79,12 @@ def train_model(model, criterion, optimizer, scheduler, dataloaders, dataset_siz
             writer.add_scalar('data/'+phase+'_Loss', epoch_loss, epoch)
 
             # deep copy the model
-            if phase == 'val' and epoch_acc > best_acc:
+            if epoch_acc > best_acc:
+                
                 best_acc = epoch_acc
                 best_model_wts = copy.deepcopy(model.state_dict())
+
+                state = {'model': best_model_wts, 'acc':   epoch_acc, 'epoch':epoch,}
 
                 if not os.path.isdir('checkpoint'):
                     os.mkdir('checkpoint')
