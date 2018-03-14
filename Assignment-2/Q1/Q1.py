@@ -92,7 +92,7 @@ def test_features(kmeans,path,labels_testing):
             image_features[np.argmin(np.sqrt(np.sum(np.square(kmeans.cluster_centers_-y),1)))]+=1
         data.append(image_features)
     pickle.dump(data,open("test_features{}.pkl".format(kmeans.cluster_centers_.shape[0]),"wb"))
-    pickle.dump(labels_features,open("labels_test_features{}.pkl".format(kmeans.cluster_centers_[0].shape[0]),"wb"))
+    pickle.dump(labels_features,open("labels_test_features{}.pkl".format(kmeans.cluster_centers_.shape[0]),"wb"))
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Classification Using Knn and Bag Of Visual Words',prog='Q1.py')
     parser.add_argument('--mode', type=int,help="""Mode for running code:\n
@@ -150,8 +150,8 @@ if __name__ == "__main__":
             args.print_help()
             sys.exit()
     elif args.mode == 4:
-        label_test = np.array(pickle.load(open(args.test_label_path,"rb")))
-        label_train = np.array(pickle.load(open(args.train_label_path,"rb")))
+        labels_training = np.loadtxt(open(args.train_label_path),delimiter=',')
+        labels_testing = np.loadtxt(open(args.test_label_path),delimiter=',')
         for i in os.listdir("./"):
             if i.endswith(".pkl"):
                 kmean = pickle.load(open(i,"rb"))
