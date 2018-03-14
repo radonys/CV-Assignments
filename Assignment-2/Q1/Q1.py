@@ -92,7 +92,7 @@ def test_features(kmeans,path,labels_testing):
             image_features[np.argmin(np.sqrt(np.sum(np.square(kmeans.cluster_centers_-y),1)))]+=1
         data.append(image_features)
     pickle.dump(data,open("test_features{}.pkl".format(kmeans.cluster_centers_.shape[0]),"wb"))
-    pickle.dump(labels_features,open("labels_test_features{}.pkl".format(kmeans.cluster_centers_[0].shape[0]),"wb"))
+    pickle.dump(labels_features,open("labels_test_features{}.pkl".format(kmeans.cluster_centers_.shape[0]),"wb"))
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Classification Using Knn and Bag Of Visual Words',prog='Q1.py')
     parser.add_argument('--mode', type=int,help="""Mode for running code:\n
