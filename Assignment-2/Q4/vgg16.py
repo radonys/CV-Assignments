@@ -14,7 +14,7 @@ import os
 import copy
 from tensorboardX import SummaryWriter
 
-from modules import train_model
+from modules1 import train_model
 
 data_dir = '/home/yash/hw2_data'
 
@@ -58,20 +58,25 @@ if use_gpu:
 
 criterion = nn.CrossEntropyLoss()
 
-for param in model.parameters():
-    param.requires_grad = False
+x = list(model.children())
+#Train last conv layer
+for param in x[0][28].parameters():
+    param.requires_grad = True
 
 #Training fully connected layers.
 for i in range(0,7):
     for param in model.classifier[i].parameters():
         param.requires_grad = True
 
-optimizer_conv = optim.SGD(model.classifier, lr=0.001, momentum=0.9)
+#Only parameters of final layer are being optimized.
+feature_model = list(model.classifier.children())
+w = feature_model[len(feature_model)-1]
+optimizer_conv = optim.SGD(w.parameters(), lr=0.001, momentum=0.9)
 
 # Decay LR by a factor of 0.1 every 7 epochs
 exp_lr_scheduler = lr_scheduler.StepLR(optimizer_conv, step_size=7, gamma=0.1)
 
-model_trained = train_model(model, criterion, optimizer_conv, exp_lr_scheduler, dataloaders, dataset_sizes, writer1, 50)
+model_trained = train_model(model, criterion, optimizer_conv, exp_lr_scheduler, dataloaders, dataset_sizes, writer1, 150)
 
 #Testing the trained network
 correct = 0
