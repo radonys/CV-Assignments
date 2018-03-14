@@ -149,20 +149,20 @@ if __name__ == "__main__":
             print("Please provide the pkl files for knn")
             args.print_help()
             sys.exit()
-    else:
-        print("Please provide proper options")
-        args.print_help()
-        sys.exit()
     elif args.mode == 4:
+        label_test = np.array(pickle.load(open(args.test_label_path,"rb")))
+        label_train = np.array(pickle.load(open(args.train_label_path,"rb")))
         for i in os.listdir("./"):
             if i.endswith(".pkl"):
                 kmean = pickle.load(open(i,"rb"))
-                label_test = np.array(pickle.load(open(args.test_label_path,"rb")))
-                label_train = np.array(pickle.load(open(args.train_label_path,"rb")))
                 print("Geneating training features and label")
                 training_features(kmean,args.train_data_path,labels_training)
                 print("Geneating test features and label")
                 test_features(kmean,args.test_data_path,labels_testing)
+    else:
+        print("Please provide proper options")
+        args.print_help()
+        sys.exit()
 
     # label_test = np.array(pickle.load(open("labels_test_features.pkl","rb")))
     # label_train = np.array(pickle.load(open("labels_training_features.pkl","rb")))
