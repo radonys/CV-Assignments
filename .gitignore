@@ -5,3 +5,4 @@ Assignment-1/Images/
 */Data/*
 */*/__pycache__/
 */*/runs/
+*.pkl
