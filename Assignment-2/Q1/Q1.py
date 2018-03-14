@@ -134,7 +134,7 @@ if __name__ == "__main__":
             label_test = np.array(pickle.load(open(args.test_label_path,"rb")))
             label_train = np.array(pickle.load(open(args.train_label_path,"rb")))
             training = np.array(pickle.load(open(args.train_data_path,"rb")))
-            testing = np.array(pickle.load(open(args.test_label_path,"rb")))
+            testing = np.array(pickle.load(open(args.test_data_path,"rb")))
             cross_validation(training,args.k,label_train)
         else:
             print("Please provide the pkl files for cross validation")
@@ -145,7 +145,7 @@ if __name__ == "__main__":
             label_test = np.array(pickle.load(open(args.test_label_path,"rb")))
             label_train = np.array(pickle.load(open(args.train_label_path,"rb")))
             training = np.array(pickle.load(open(args.train_data_path,"rb")))
-            testing = np.array(pickle.load(open(args.test_label_path,"rb")))
+            testing = np.array(pickle.load(open(args.test_data_path,"rb")))
             knn(training,args.k,label_train)
         else:
             print("Please provide the pkl files for knn")
@@ -155,7 +155,7 @@ if __name__ == "__main__":
         label_test = np.array(pickle.load(open(args.test_label_path,"rb")))
         label_train = np.array(pickle.load(open(args.train_label_path,"rb")))
         training = np.array(pickle.load(open(args.train_data_path,"rb")))
-        testing = np.array(pickle.load(open(args.test_label_path,"rb")))
+        testing = np.array(pickle.load(open(args.test_data_path,"rb")))
         kval = cross_validation(training,args.k,label_train)
         kNN = knn(testing,training,kval[0][1],label_test,label_train)
         kval.append(kNN)
