@@ -154,11 +154,11 @@ if __name__ == "__main__":
         args.print_help()
         sys.exit()
     elif args.mode == 4:
+        label_test = np.array(pickle.load(open(args.test_label_path,"rb")))
+        label_train = np.array(pickle.load(open(args.train_label_path,"rb")))
         for i in os.listdir("./"):
             if i.endswith(".pkl"):
                 kmean = pickle.load(open(i,"rb"))
-                label_test = np.array(pickle.load(open(args.test_label_path,"rb")))
-                label_train = np.array(pickle.load(open(args.train_label_path,"rb")))
                 print("Geneating training features and label")
                 training_features(kmean,args.train_data_path,labels_training)
                 print("Geneating test features and label")
