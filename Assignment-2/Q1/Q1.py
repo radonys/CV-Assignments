@@ -150,8 +150,8 @@ if __name__ == "__main__":
             args.print_help()
             sys.exit()
     elif args.mode == 4:
-        label_test = np.array(pickle.load(open(args.test_label_path,"rb")))
-        label_train = np.array(pickle.load(open(args.train_label_path,"rb")))
+        labels_training = np.loadtxt(open(args.train_label_path),delimiter=',')
+        labels_testing = np.loadtxt(open(args.test_label_path),delimiter=',')
         for i in os.listdir("./"):
             if i.endswith(".pkl"):
                 kmean = pickle.load(open(i,"rb"))
