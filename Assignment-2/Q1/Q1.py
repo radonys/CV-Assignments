@@ -6,7 +6,7 @@ from sklearn.cluster import KMeans
 from sklearn.model_selection import KFold
 import argparse
 import sys
-import os
+import re
 import time
 # class cus_heap():
 #     def __init__(self,data=[]):
@@ -35,7 +35,7 @@ def cross_validation(arr,n_split,labels,k_start=1,k_end=101):
         for i in range(k_start,k_end+1,2):
             results.append((knn(test_split,train_split,i,label_test_split,label_train_split,DEBUG=False),i))
     print(max(results))
-    return max(results)
+    return [max(results),results]
 
 def knn(testing,training,k,label_test,label_train,DEBUG=True):
     acc = 0.0
@@ -99,8 +99,10 @@ if __name__ == "__main__":
     1)Kmeans bag of words Generation and feature Generation\n
     2)Cross validation in Kfolds\n
     3)Classification using KNN
+    4)Cross Validation and Classification with KNN results
     """,choices=[1,2,3,4],default=1)
     parser.add_argument('--k',type=int,help="K for KMeans, KNN or Kfolds (compulsary)")
+    parser.add_argument("--kmeans_cluster",type=str,help="Path cluster pkl file",default="50-means.pkl")
     parser.add_argument("--train_data_path",type=str,help="Path to train folder/pkl",default="../Data/train_sift_features")
     parser.add_argument("--test_data_path",type=str,help="Path to test folder/pkl",default="../Data/test_sift_features")
     parser.add_argument("--train_label_path",type=str,help="Path to train label file/pkl",default="../Data/train_labels.csv")
@@ -150,15 +152,26 @@ if __name__ == "__main__":
             args.print_help()
             sys.exit()
     elif args.mode == 4:
-        labels_training = np.loadtxt(open(args.train_label_path),delimiter=',')
-        labels_testing = np.loadtxt(open(args.test_label_path),delimiter=',')
-        for i in os.listdir("./"):
-            if i.endswith(".pkl"):
-                kmean = pickle.load(open(i,"rb"))
-                print("Geneating training features and label")
-                training_features(kmean,args.train_data_path,labels_training)
-                print("Geneating test features and label")
-                test_features(kmean,args.test_data_path,labels_testing)
+        label_test = np.array(pickle.load(open(args.test_label_path,"rb")))
+        label_train = np.array(pickle.load(open(args.train_label_path,"rb")))
+        training = np.array(pickle.load(open(args.train_data_path,"rb")))
+        testing = np.array(pickle.load(open(args.test_label_path,"rb")))
+        kval = cross_validation(training,args.k,label_train)
+        kNN = knn(testing,training,kval[0][1],label_test,label_train)
+        kval.append(kNN)
+        featurelength = re.findall('\d+', args.test_label_path )[0]
+        pickle.dump(kval,open("result-{}.pkl".format(featurelength),"wb"))
+
+    # elif args.mode == 4:
+    #     labels_training = np.loadtxt(open(args.train_label_path),delimiter=',')
+    #     labels_testing = np.loadtxt(open(args.test_label_path),delimiter=',')
+    #     for i in os.listdir("./"):
+    #         if i.endswith(".pkl"):
+    #             kmean = pickle.load(open(i,"rb"))
+    #             print("Geneating training features and label")
+    #             training_features(kmean,args.train_data_path,labels_training)
+    #             print("Geneating test features and label")
+    #             test_features(kmean,args.test_data_path,labels_testing)
     else:
         print("Please provide proper options")
         args.print_help()
