@@ -22,6 +22,8 @@ import time
 #         return heap.nsmallest(self.data,n)
 #     def reinit():
 
+# python Q1.py --mode=4 --k=5 --test_label_path=labels_test_features40.pkl --train_label_path=labels_training_features_40.pkl --train_data_path=training_features40.pkl --test_data_path=test_features40.pkl
+
 
 def cross_validation(arr,n_split,labels,k_start=1,k_end=101):
     kf = KFold(n_splits=n_split)
