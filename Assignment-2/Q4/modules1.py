@@ -89,7 +89,7 @@ def train_model(model, criterion, optimizer, scheduler, dataloaders, dataset_siz
                 if not os.path.isdir('checkpoint'):
                     os.mkdir('checkpoint')
                 save_point = 'checkpoint/'
-                torch.save(state, save_point+"alexnet_best"+'.t7')
+                torch.save(state, save_point+"vgg16_best"+'.t7')
                 
         print()
 

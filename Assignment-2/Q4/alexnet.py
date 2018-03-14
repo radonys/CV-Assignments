@@ -26,7 +26,7 @@ data_transforms = {
         transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
     ]),
     'testf': transforms.Compose([
-        transforms.Resize(256),
+        transforms.Resize(224),
         transforms.CenterCrop(224),
         transforms.ToTensor(),
         transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
@@ -58,6 +58,14 @@ if use_gpu:
 
 criterion = nn.CrossEntropyLoss()
 
+for param in model.parameters():
+    param.requires_grad = False
+
+#Training fully connected layers.
+for i in range(0,7):
+    for param in model.classifier[i].parameters():
+        param.requires_grad = True
+
 #Only parameters of final layer are being optimized.
 feature_model = list(model.classifier.children())
 w = feature_model[len(feature_model)-1]
@@ -66,7 +74,7 @@ optimizer_conv = optim.SGD(w.parameters(), lr=0.001, momentum=0.9)
 # Decay LR by a factor of 0.1 every 7 epochs
 exp_lr_scheduler = lr_scheduler.StepLR(optimizer_conv, step_size=7, gamma=0.1)
 
-model_trained = train_model(model, criterion, optimizer_conv, exp_lr_scheduler, dataloaders, dataset_sizes, writer1, 50)
+model_trained = train_model(model, criterion, optimizer_conv, exp_lr_scheduler, dataloaders, dataset_sizes, writer1, 150)
 
 #Testing the trained network
 correct = 0
