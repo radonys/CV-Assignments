@@ -14,7 +14,7 @@ import os
 import copy
 from tensorboardX import SummaryWriter
 
-from modules import train_model
+from modules1 import train_model
 
 data_dir = '/home/yash/hw2_data'
 
@@ -58,8 +58,10 @@ if use_gpu:
 
 criterion = nn.CrossEntropyLoss()
 
-for param in model.parameters():
-    param.requires_grad = False
+x = list(model.children())
+#Train last conv layer
+for param in x[0][28].parameters():
+    param.requires_grad = True
 
 #Training fully connected layers.
 for i in range(0,7):
