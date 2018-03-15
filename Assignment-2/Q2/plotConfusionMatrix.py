@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-def plotConfusionMatrixFunction(conf_arr, image_name):
+def plotConfusionMatrixFunction(conf_arr, image_name,title=""):
 
     np_conf_arr = np.array(conf_arr)
 
@@ -18,7 +18,7 @@ def plotConfusionMatrixFunction(conf_arr, image_name):
     plt.clf()
     ax = fig.add_subplot(111)
     ax.set_aspect(1)
-    res = ax.imshow(np.array(norm_conf), cmap=plt.cm.jet,
+    res = ax.imshow(np.array(norm_conf), cmap=plt.cm.BuPu,
                     interpolation='nearest')
 
     width, height = np_conf_arr.shape
@@ -33,4 +33,5 @@ def plotConfusionMatrixFunction(conf_arr, image_name):
     alphabet = list(range(1,width+1))
     plt.xticks(range(width), alphabet[:width])
     plt.yticks(range(height), alphabet[:height])
+    plt.title(title)
     plt.savefig(image_name, format='png')
