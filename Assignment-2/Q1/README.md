@@ -33,7 +33,7 @@ optional arguments:
 
 ## Results
 Best BOVW size/ Number of clusters : 80<br>
-Best `K` value (using **5** fold cross-validation): 15<br>
+Best `K` value (using **5** fold cross-validation): 27<br>
 Best Accuracy: **56.44555694618273%**
 
 ## Stats
