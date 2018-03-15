@@ -53,4 +53,3 @@ To visualize the current results, open a terminal session, and run the following
 ![Train Accuracy](https://github.com/radonys/CV-Assignments/blob/master/Assignment-2/Q4/vggtrainacc.png "Train Accuracy")
 ![Train Loss](https://github.com/radonys/CV-Assignments/blob/master/Assignment-2/Q4/vggtrainloss.png "Train Loss")
 ![Test Accuracy](https://github.com/radonys/CV-Assignments/blob/master/Assignment-2/Q4/vggtestacc.png "Test Accuracy")
-<img src = "https://github.com/radonys/CV-Assignments/blob/master/Assignment-2/Q4/vggtestacc.png">
