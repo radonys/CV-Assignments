@@ -16,4 +16,6 @@ Conditions:
 3. max_iter = 10000
 4. Tolerance tol = 0.01
 
-Image:
+Confusuion Matrix Image:
+
+![confusion_matrix]('confusion_matrix_100.png')
