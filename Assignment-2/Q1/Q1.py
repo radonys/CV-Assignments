@@ -8,7 +8,7 @@ import argparse
 import sys
 import re
 import time
-import plotConfusionMatrix
+from plotConfusionMatrix import plotConfusionMatrixFunction
 # class cus_heap():
 #     def __init__(self,data=[]):
 #         self.data = data
@@ -53,7 +53,7 @@ def knn(testing,training,k,label_test,label_train,DEBUG=True,n_class = 8,confusi
         if prediction == label_test[index]:
             acc+=1
         if confusion:
-            confusion_matrix[prediction][label_test[index]]+=1
+            confusion_matrix[prediction-1][int(label_test[index])-1]+=1
     if DEBUG:
         print("Accuracy: {}%".format(100*acc/index))
     # print("Accuracy: {}%".format(100*acc/index))
@@ -159,7 +159,10 @@ if __name__ == "__main__":
             label_train = np.array(pickle.load(open(args.train_label_path,"rb")))
             training = np.array(pickle.load(open(args.train_data_path,"rb")))
             testing = np.array(pickle.load(open(args.test_data_path,"rb")))
-            knn(training,args.k,label_train)
+            kNN = knn(testing,training,args.k,label_test,label_train,confusion=args.confusion)
+            if args.confusion:
+                featurelength = re.findall('\d+', args.test_label_path )[0]
+                plotConfusionMatrixFunction(kNN[1],"confusion_{}_{}.png".format(featurelength,args.k),title="Confusion Matrix for K:{} and BOVW size:{}".format(args.k,featurelength))
         else:
             print("Please provide the pkl files for knn")
             args.print_help()
@@ -175,7 +178,7 @@ if __name__ == "__main__":
         featurelength = re.findall('\d+', args.test_label_path )[0]
         pickle.dump(kval,open("result-{}.pkl".format(featurelength),"wb"))
         if args.confusion:
-            plotConfusionMatrix(kNN[1],"confusion_{}.png".format(featurelength))
+            plotConfusionMatrixFunction(kNN[1],"confusion_{}.png".format(featurelength))
 
 
     # elif args.mode == 4:
