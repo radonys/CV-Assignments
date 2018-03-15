@@ -178,7 +178,7 @@ if __name__ == "__main__":
         featurelength = re.findall('\d+', args.test_label_path )[0]
         pickle.dump(kval,open("result-{}.pkl".format(featurelength),"wb"))
         if args.confusion:
-            plotConfusionMatrixFunction(kNN[1],"confusion_{}.png".format(featurelength))
+            plotConfusionMatrixFunction(kNN[1],"confusion_{}.png".format(featurelength),title="Confusion Matrix for best K:{} and BOVW size:{}".format(kval[0][1],featurelength))
 
 
     # elif args.mode == 4:

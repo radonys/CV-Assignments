@@ -18,7 +18,7 @@ def plotConfusionMatrixFunction(conf_arr, image_name,title=""):
     plt.clf()
     ax = fig.add_subplot(111)
     ax.set_aspect(1)
-    res = ax.imshow(np.array(norm_conf), cmap=plt.cm.BuPu_r,
+    res = ax.imshow(np.array(norm_conf), cmap=plt.cm.BuPu,
                     interpolation='nearest')
 
     width, height = np_conf_arr.shape
