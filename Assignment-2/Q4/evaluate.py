@@ -58,7 +58,7 @@ feature_model.pop()
 feature_model.append(nn.Linear(num_ftrs, 8))
 model.classifier = nn.Sequential(*feature_model)
 
-checkpoint = torch.load('checkpoint/'+"alexnet_best"+'.t7')
+checkpoint = torch.load('checkpoint/'+"vgg16_best"+'.t7')
 
 model.load_state_dict(checkpoint)
 
