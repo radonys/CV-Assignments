@@ -8,6 +8,7 @@ import argparse
 import sys
 import re
 import time
+import plotConfusionMatrix
 # class cus_heap():
 #     def __init__(self,data=[]):
 #         self.data = data
@@ -39,17 +40,25 @@ def cross_validation(arr,n_split,labels,k_start=1,k_end=101):
     print(max(results))
     return [max(results),results]
 
-def knn(testing,training,k,label_test,label_train,DEBUG=True):
+def knn(testing,training,k,label_test,label_train,DEBUG=True,n_class = 8,confusion=False):
     acc = 0.0
+    if confusion:
+        confusion_matrix = np.zeros((n_class,n_class)).tolist()
     for index,feature in enumerate(testing):
         distance = np.sqrt(np.sum(np.square(training-feature),1).reshape(-1,1))
         #print(label_train.shape)
         predictions = [ i[1] for i in heapq.nsmallest(k,np.append(distance,label_train.reshape(-1,1),1).tolist()) ]
         #print(predictions, max(set(predictions),key=predictions.count),label_test[index],index)
-        if max(set(predictions),key=predictions.count) == label_test[index]:
+        prediction = int(max(set(predictions),key=predictions.count))
+        if prediction == label_test[index]:
             acc+=1
+        if confusion:
+            confusion_matrix[prediction][label_test[index]]+=1
     if DEBUG:
         print("Accuracy: {}%".format(100*acc/index))
+    # print("Accuracy: {}%".format(100*acc/index))
+    if confusion:
+        return [100*acc/index,confusion_matrix]
     return(100*acc/index)
 
 def kmeans(K,path):
@@ -109,6 +118,8 @@ if __name__ == "__main__":
     parser.add_argument("--test_data_path",type=str,help="Path to test folder/pkl",default="../Data/test_sift_features")
     parser.add_argument("--train_label_path",type=str,help="Path to train label file/pkl",default="../Data/train_labels.csv")
     parser.add_argument("--test_label_path",type=str,help="Path to test labels file/pkl",default="../Data/test_labels.csv")
+    parser.add_argument("--confusion",type=int,choices=[0,1],help="plot confusion matrix",default=0)
+
     args = parser.parse_args()
     if args.k==None:
         print("Please provide K value")
@@ -159,10 +170,13 @@ if __name__ == "__main__":
         training = np.array(pickle.load(open(args.train_data_path,"rb")))
         testing = np.array(pickle.load(open(args.test_data_path,"rb")))
         kval = cross_validation(training,args.k,label_train)
-        kNN = knn(testing,training,kval[0][1],label_test,label_train)
+        kNN = knn(testing,training,kval[0][1],label_test,label_train,confusion=args.confusion)
         kval.append(kNN)
         featurelength = re.findall('\d+', args.test_label_path )[0]
         pickle.dump(kval,open("result-{}.pkl".format(featurelength),"wb"))
+        if args.confusion:
+            plotConfusionMatrix(kNN[1],"confusion_{}.png".format(featurelength))
+
 
     # elif args.mode == 4:
     #     labels_training = np.loadtxt(open(args.train_label_path),delimiter=',')
