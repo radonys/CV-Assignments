@@ -45,9 +45,22 @@ class_names = image_datasets['trainf'].classes
 print("| Loading checkpoint model for test phase...")
 assert os.path.isdir('checkpoint'), 'Error: No checkpoint directory found!'
 
+model = torchvision.models.vgg16(pretrained=False)
+
+#Don't modify the weights while training.
+for param in model.parameters():
+    param.requires_grad = False
+#Parameters of newly constructed modules have requires_grad=True by default
+
+num_ftrs = model.classifier[6].in_features
+feature_model = list(model.classifier.children())
+feature_model.pop()
+feature_model.append(nn.Linear(num_ftrs, 8))
+model.classifier = nn.Sequential(*feature_model)
+
 checkpoint = torch.load('checkpoint/'+"alexnet_best"+'.t7')
 
-model = checkpoint['model']
+model.load_state_dict(checkpoint)
 
 if use_gpu:
     model.cuda()
@@ -66,7 +79,7 @@ for data in dataloaders['testf']:
     _, predicted = torch.max(outputs.data, 1)
     total += labels.size(0)
     correct += (predicted == labels).sum()
-    writer.add_scalar('data/Test_Accuracy', (correct/total) * 100, i)
+    writer.add_scalar('data1/Test_Accuracy', (correct/total) * 100, i)
     i = i + 1
 
 print('Accuracy of the network on the 800 test images: %d %%' % (100 * correct / total))
