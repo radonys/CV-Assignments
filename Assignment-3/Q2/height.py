@@ -1,31 +1,30 @@
 import cv2
 import math
-from time import time
 
 boxes = []
-
-xCount = 0
-yCount = 0
 iter = 0
 
 def on_mouse(event, x, y, flags, params):
     
     global iter
-    t = time()
 
     if event == cv2.EVENT_LBUTTONDOWN:
-        print ('Start Mouse Position: '+str(x)+', '+str(y))
-        sbox = (x, y)
-        boxes.append(sbox)
+
+        print ('Start Mouse Position: ' + str(x) + ', ' + str(y))
+
+        start_point = (x, y)
+        boxes.append(start_point)
 
     elif event == cv2.EVENT_LBUTTONUP:
+
         print ('End Mouse Position: '+str(x)+', '+str(y))
-        ebox = (x, y)
-        boxes.append(ebox)
+
+        end_point = (x, y)
+        boxes.append(end_point)
+
         cv2.line(img, boxes[-1], boxes[-2],(0,255,0),10)
-        # print boxes
+
         iter += 1
-        # print iter
 
 
 def line_intersection(line1, line2):
@@ -37,12 +36,14 @@ def line_intersection(line1, line2):
         return a[0] * b[1] - a[1] * b[0]
 
     div = det(xdiff, ydiff)
+
     if div == 0:
        raise Exception('lines do not intersect')
 
     d = (det(*line1), det(*line2))
     x = det(d, xdiff) / div
     y = det(d, ydiff) / div
+
     return x, y
 
 def norm(point1, point2):
@@ -51,78 +52,94 @@ def norm(point1, point2):
     ydiff = point1[1] - point2[1]
 
     norm = math.sqrt(xdiff*xdiff + ydiff*ydiff)
-    # print norm
-    return norm
 
+    return norm
 
 print ("-------------------------INSTRUCTIONS----------------------------")
 print ("Draw 8 line segments, holding mouse while drawing")
-print ("First two for xVanish")
-print ("Next two for yVanish")
-'''print "Next two for objects whose lengths are to be compared"
-print "First draw for shorter object in image plane starting from bottom"
-print "Then for other object again starting from bottom"
-print "Finally two for zVanish"
-print "-----------------------------END---------------------------------"'''
+print ("First two lines for a pair of parallel lines")
+print ("Next two lines for another pair of parallel lines")
+print ("Finally two lines for a third pair of parallel lines to find Vz")
+print ("Now, two lines for objects whose lengths are to be compared")
+print ("First draw line for shorter object in image plane starting from bottom")
+print ("Then for other object again starting from bottom")
+print ("-----------------------------END---------------------------------")
+font = cv2.FONT_HERSHEY_SIMPLEX
 
 count = 0
 img = cv2.imread('img2.jpg')
-    # img = cv2.blur(img, (3,3))
-# img = cv2.resize(img, None, fx = 0.8,fy = 0.8)
+number_of_objects = int(raw_input("Number of Objects to be measured:"))
+
 while(1):
-    # print count
-    if iter == 8:
-        break
+
+    #if iter == 7 + number_of_objects:
+    #    break
 
     count += 1
 
     cv2.namedWindow('image',cv2.WINDOW_NORMAL)
-    # cv2.resizeWindow('image', 600,600)
     cv2.setMouseCallback('image', on_mouse, 0)
     cv2.imshow('image', img)
 
     if count < 50:
+
         if cv2.waitKey(33) == 27:
+
             cv2.destroyAllWindows()
             break
+
     elif count >= 50:
         count = 0
+
     if iter==2:
-        xVanish = line_intersection( [boxes[0],boxes[1]], [boxes[2],boxes[3]] )
-        cv2.circle(img,xVanish,10,(0,0,255),20)
-        print("XPOINT")
+
+        parallel_1 = line_intersection( [boxes[0],boxes[1]], [boxes[2],boxes[3]] )
+        cv2.circle(img,parallel_1,10,(0,0,255),20)
+
     if iter==4:
-        yVanish = line_intersection( [boxes[4],boxes[5]], [boxes[6],boxes[7]] )
-        cv2.circle(img,yVanish,10,(0,0,255),10)
-        x = img.shape[0]
-        y = ((xVanish[1]-yVanish[1])*(x-yVanish[0])/(xVanish[0]-yVanish[0]))+yVanish[1]
-        cv2.line(img, (x,y), yVanish,(0,255,0),20)
-        print("XPOINT")
 
-# print (xVanish)
+        parallel_2 = line_intersection( [boxes[4],boxes[5]], [boxes[6],boxes[7]] )
+        cv2.circle(img,parallel_2,10,(0,0,255),10)
 
-xVanish = line_intersection( [boxes[0],boxes[1]], [boxes[2],boxes[3]] )
-print (xVanish)
+        x1 = img.shape[0]
+        y1 = ((parallel_1[1]-parallel_2[1])*(x1-parallel_2[0])/(parallel_1[0]-parallel_2[0])) + parallel_2[1]
 
-yVanish = line_intersection( [boxes[4],boxes[5]], [boxes[6],boxes[7]] )
-print (yVanish)
+        x2 = 0
+        y2 = ((parallel_1[1]-parallel_2[1])*(x2-parallel_2[0])/(parallel_1[0]-parallel_2[0])) + parallel_2[1]
 
-zVanish = line_intersection( [boxes[12],boxes[13]], [boxes[14],boxes[15]] )
-print (zVanish)
+        cv2.line(img, (x1,y1), (x2,y2), (0,255,0), 20)
 
-print ("Assuming bottom is given as first input for each object")
-vertex = line_intersection( [xVanish,yVanish], [boxes[8],boxes[10]] )
+parallel_1 = line_intersection( [boxes[0],boxes[1]], [boxes[2],boxes[3]] )
+print (parallel_1)
 
-bot = boxes[10]
-ref = line_intersection( [vertex,boxes[9]], [boxes[10],boxes[11]] )
-top = boxes[11]
+parallel_2 = line_intersection( [boxes[4],boxes[5]], [boxes[6],boxes[7]] )
+print (parallel_2)
 
-response1 = float(raw_input("Please enter height of shorter object, enter 0 if unknown: "))
-response2 = float(raw_input("Please enter height of other object, enter 0 if unknown: "))
+Vz_Parallel = line_intersection( [boxes[8],boxes[9]], [boxes[10],boxes[11]] )
+print (Vz_Parallel)
 
-response = response1 + response2
-# print "Assuming Vz at infinity"
-# print response
+for i in range(0,number_of_objects):
 
-print ("Length of unknown object is")
-print (( (norm(top,bot)/norm(ref,bot))*(norm(zVanish,ref)/norm(zVanish,top))*response ) )
+    print ("Assuming bottom is given as first input for each object")
+    vertex = line_intersection( [parallel_1,parallel_2], [boxes[12],boxes[13+(2*i)+1]] )
+
+    bot = boxes[13+(2*i)+1]
+    ref = line_intersection( [vertex,boxes[13]], [boxes[13+(2*i)+1],boxes[13+(2*i)+2]] )
+    top = boxes[13+(2*i)+2]
+
+    response1 = float(raw_input("Please enter height of shorter object, enter 0 if unknown: "))
+    response2 = float(raw_input("Please enter height of other object, enter 0 if unknown: "))
+
+    response = response1 + response2
+
+    print ("Length of unknown object is")
+    print (( (norm(top,bot)/norm(ref,bot))*(norm(Vz_Parallel,ref)/norm(Vz_Parallel,top))*response ) )
+    value = str(( (norm(top,bot)/norm(ref,bot))*(norm(Vz_Parallel,ref)/norm(Vz_Parallel,top))*response ) )
+    cv2.putText(img,value,top, font, 4,(0,0,0),10,cv2.LINE_AA)
+
+cv2.namedWindow('image1',cv2.WINDOW_NORMAL)
+cv2.imshow('image1', img)
+k=0
+while k!=27:
+    k = cv2.waitKey(33)   # Esc key to stop
+    
