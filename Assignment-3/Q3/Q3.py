@@ -67,7 +67,7 @@ if __name__ == '__main__':
             u,s,vh = np.linalg.svd(A)
             xtemp = np.hstack([x_p,np.ones((x.shape[0],1))])
             xori = np.hstack([x,np.ones((x_p.shape[0],1))])
-            L = vh[-1,:] / vh[-1,-1]
+            L = vh[-1,:]
             h = L.reshape((3,3))
             homo_x = np.matmul(h,kp2_coordinates.T)
             k = np.linalg.norm(kp1_coordinates-homo_x.T,axis=1)<3
@@ -87,7 +87,7 @@ if __name__ == '__main__':
     plt.title("Merged Image: Own implementation")
     plt.imshow(result)
     plt.figure()
-    plt.title("Merged Image: Using CV2 homograpgy")
+    plt.title("Merged Image: Using CV2 homography")
     plt.imshow(result1)
 
 
