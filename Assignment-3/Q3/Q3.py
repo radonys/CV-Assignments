@@ -3,6 +3,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 import sys
 import random
+from scipy.sparse.linalg import svds
+from sklearn import linear_model
 Detector = cv2.xfeatures2d.SIFT_create()
 def SIFT(image):
     return Detector.detectAndCompute(image,None)
@@ -38,31 +40,55 @@ if __name__ == '__main__':
     for i in range(len(features2)):
         ptA = (int(kps1[i].pt[0]), int(kps1[i].pt[1]))
         ptB = (int(kps2[i].pt[0]) + wA, int(kps2[i].pt[1]))
-        cv2.line(vis, ptA, ptB, (0, 255, 0), 1)
+        cv2.line(vis, ptA, ptB, (random.randint(0,255), random.randint(0,255), random.randint(0,255)), 1)
+    plt.title("Matches")
     plt.imshow(vis)
     kps1 = np.array(kps1)
     kps2 = np.array(kps2)
     #calculating homography
+    kp1_coordinates = np.array([ [i.pt[0],i.pt[1],1]for i in kps1])
+    kp2_coordinates = np.array([ [i.pt[0],i.pt[1],1]for i in kps2])
+    # ransac = linear_model.RANSACRegressor()
+    # ransac.fit(kp2_coordinates, kp1_coordinates)
+    # print(ransac.estimator_.coef_)
     if len(kps1)>=4:
         best_h = np.array([])
         best_count = -1
         for i in range(len(kps1)):
             ind = np.array(random.sample(list(range(len(kps1))),4))
-            x = np.array([[i.pt[0],i.pt[1]] for i in kps1[ind]])
-            x_p = np.array([[i.pt[0],i.pt[1]] for i in kps2[ind]])
+            x_p = np.array([[v.pt[0],v.pt[1]] for v in kps1[ind]])
+            x = np.array([[v.pt[0],v.pt[1]] for v in kps2[ind]])
             A = np.array([])
-            print(x,x_p)
             for j in range(4):
                 A = np.vstack([A,
                 [[-x[j,0],-x[j,1],-1,0,0,0,x[j,0]*x_p[j,0],x[j,1]*x_p[j,0],x_p[j,0]],
                 [0,0,0,-x[j,0],-x[j,1],-1,x[j,0]*x_p[j,1],x[j,1]*x_p[j,1],x_p[j,1]]]]
                 ) if A.size else np.array([[-x[j,0],-x[j,1],-1,0,0,0,x[j,0]*x_p[j,0],x[j,1]*x_p[j,0],x_p[j,0]],[0,0,0,-x[j,0],-x[j,1],-1,x[j,0]*x_p[j,1],x[j,1]*x_p[j,1],x_p[j,1]]])
-            
-            # print(A)
-    else:
-        print("Stitching not Possible")
-        sys.exit()
+            u,s,vh = np.linalg.svd(A)
+            xtemp = np.hstack([x_p,np.ones((x.shape[0],1))])
+            xori = np.hstack([x,np.ones((x_p.shape[0],1))])
+            L = vh[-1,:] / vh[-1,-1]
+            h = L.reshape((3,3))
+            homo_x = np.matmul(h,kp2_coordinates.T)
+            k = np.linalg.norm(kp1_coordinates-homo_x.T,axis=1)<3
+            if best_count<np.count_nonzero(k):
+                best_count = np.count_nonzero(k)
+                best_h = h
+    # print(best_count)
+    result = cv2.warpPerspective(img2,best_h,
+    	(img1.shape[1] + img2.shape[1], img1.shape[0]))
+    result[0:img1.shape[0],0:img2.shape[1]] = img1
 
+    H,mask = cv2.findHomography(kp2_coordinates, kp1_coordinates, cv2.RANSAC,5.0)
+    result1 = cv2.warpPerspective(img2,H,
+    	(img1.shape[1] + img2.shape[1], img1.shape[0]))
+    result1[0:img1.shape[0],0:img2.shape[1]] = img1
+    plt.figure()
+    plt.title("Merged Image: Own implementation")
+    plt.imshow(result)
+    plt.figure()
+    plt.title("Merged Image: Using CV2 homograpgy")
+    plt.imshow(result1)
 
 
 
