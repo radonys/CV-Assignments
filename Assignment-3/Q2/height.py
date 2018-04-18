@@ -66,7 +66,7 @@ print "Finally two for zVanish"
 print "-----------------------------END---------------------------------"'''
 
 count = 0
-img = cv2.imread('img2.jpg',0)
+img = cv2.imread('img2.jpg')
     # img = cv2.blur(img, (3,3))
 # img = cv2.resize(img, None, fx = 0.8,fy = 0.8)
 while(1):
@@ -77,7 +77,7 @@ while(1):
     count += 1
 
     cv2.namedWindow('image',cv2.WINDOW_NORMAL)
-    cv2.resizeWindow('image', 600,600)
+    # cv2.resizeWindow('image', 600,600)
     cv2.setMouseCallback('image', on_mouse, 0)
     cv2.imshow('image', img)
 
@@ -87,6 +87,19 @@ while(1):
             break
     elif count >= 50:
         count = 0
+    if iter==2:
+        xVanish = line_intersection( [boxes[0],boxes[1]], [boxes[2],boxes[3]] )
+        cv2.circle(img,xVanish,10,(0,0,255),20)
+        print("XPOINT")
+    if iter==4:
+        yVanish = line_intersection( [boxes[4],boxes[5]], [boxes[6],boxes[7]] )
+        cv2.circle(img,yVanish,10,(0,0,255),10)
+        x = img.shape[0]
+        y = ((xVanish[1]-yVanish[1])*(x-yVanish[0])/(xVanish[0]-yVanish[0]))+yVanish[1]
+        cv2.line(img, (x,y), yVanish,(0,255,0),20)
+        print("XPOINT")
+
+# print (xVanish)
 
 xVanish = line_intersection( [boxes[0],boxes[1]], [boxes[2],boxes[3]] )
 print (xVanish)
