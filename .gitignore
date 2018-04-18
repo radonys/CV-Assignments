@@ -7,3 +7,5 @@ Assignment-1/Images/
 */*/runs/
 *.pkl
 *.png
+*env*
+*.DS_Store*
