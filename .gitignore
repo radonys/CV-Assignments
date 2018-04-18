@@ -7,5 +7,10 @@ Assignment-1/Images/
 */*/runs/
 *.pkl
 *.png
+<<<<<<< Updated upstream
 *env*
 *.DS_Store*
+=======
+*env
+*.DS_Store
+>>>>>>> Stashed changes
