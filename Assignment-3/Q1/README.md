@@ -8,15 +8,16 @@
 
 ## How to Execute
 
-1. Change the image path at this [line](https://github.com/radonys/CV-Assignments/blob/f9304e2ad4d86df1c7b83a7c8522a748b521e506/Assignment-3/Q2/height.py#L70) of the code with the path of your given input image.
-2. Then follow the instructions as displayed in the terminal.
+1. Change the image path at this [line](https://github.com/radonys/CV-Assignments/blob/a53a7ff8fa51f4234033b9e9cb2d1b6fec61965f/Assignment-3/Q1/1.py#L143) of the code with the path of your given input image.
+2. Then plot 3 pairs of parallel lines in the image to obtain a vanishing point.
+3. Repeat Step 2 for second vanishing point and then a vanishing line is obtained.
 
 ## Results
 
 Results are computed for image:
  
-![img2.jpg](https://github.com/radonys/CV-Assignments/blob/master/Assignment-3/Q2/img2.jpg "Input Image")
+![img1.jpg](https://github.com/radonys/CV-Assignments/blob/master/Assignment-3/Q1/img1.jpg "Input Image")
 
-With height of sign post given as **1.65**, the results are shown below:
+The results are shown below:
 
 ![Q2_Result.png](https://github.com/radonys/CV-Assignments/blob/master/Assignment-3/Q2/Q2_Result.png "Output Image")
