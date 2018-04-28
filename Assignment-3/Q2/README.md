@@ -1,4 +1,4 @@
-# Question 2
+# Question 2 - Height of Objects in an Image
 
 ## Installing Dependencies
 
