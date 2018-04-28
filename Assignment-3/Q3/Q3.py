@@ -1,10 +1,11 @@
 import cv2
 import numpy as np
+import numpy
 import matplotlib.pyplot as plt
 import sys
 import random
-from scipy.sparse.linalg import svds
-from sklearn import linear_model
+NN_THRESHOLD = 0.7
+PIXEL_ERROR_THRESHOLD = 3
 Detector = cv2.xfeatures2d.SIFT_create()
 def SIFT(image):
     return Detector.detectAndCompute(image,None)
@@ -16,7 +17,7 @@ def matches(feature1,feature2,kp1,kp2):
     features2 = []
     for k,i in enumerate(feature2):
         ind = np.argsort(np.linalg.norm(np.subtract(feature1,i),axis=1))[:2]
-        if np.linalg.norm(i-feature1[ind[0]])< 0.7 * np.linalg.norm(i-feature1[ind[1]]): #ratio : 0.7-0.8
+        if np.linalg.norm(i-feature1[ind[0]])< NN_THRESHOLD * np.linalg.norm(i-feature1[ind[1]]): #ratio : 0.7-0.8
             kps2.append(kp2[k])
             features2.append(i)
             kps1.append(kp1[ind[0]])
@@ -41,6 +42,7 @@ if __name__ == '__main__':
         ptA = (int(kps1[i].pt[0]), int(kps1[i].pt[1]))
         ptB = (int(kps2[i].pt[0]) + wA, int(kps2[i].pt[1]))
         cv2.line(vis, ptA, ptB, (random.randint(0,255), random.randint(0,255), random.randint(0,255)), 1)
+    plt.imsave("Matches.jpg",vis)
     plt.title("Matches")
     plt.imshow(vis)
     kps1 = np.array(kps1)
@@ -56,30 +58,56 @@ if __name__ == '__main__':
         best_count = -1
         for i in range(len(kps1)):
             ind = np.array(random.sample(list(range(len(kps1))),4))
-            x_p = np.array([[v.pt[0],v.pt[1]] for v in kps1[ind]])
-            x = np.array([[v.pt[0],v.pt[1]] for v in kps2[ind]])
+            x_p = np.array([[v.pt[0],v.pt[1],1] for v in kps1[ind]])
+            x = np.array([[v.pt[0],v.pt[1],1] for v in kps2[ind]])
             A = np.array([])
-            for j in range(4):
-                A = np.vstack([A,
-                [[-x[j,0],-x[j,1],-1,0,0,0,x[j,0]*x_p[j,0],x[j,1]*x_p[j,0],x_p[j,0]],
-                [0,0,0,-x[j,0],-x[j,1],-1,x[j,0]*x_p[j,1],x[j,1]*x_p[j,1],x_p[j,1]]]]
-                ) if A.size else np.array([[-x[j,0],-x[j,1],-1,0,0,0,x[j,0]*x_p[j,0],x[j,1]*x_p[j,0],x_p[j,0]],[0,0,0,-x[j,0],-x[j,1],-1,x[j,0]*x_p[j,1],x[j,1]*x_p[j,1],x_p[j,1]]])
-            u,s,vh = np.linalg.svd(A)
-            xtemp = np.hstack([x_p,np.ones((x.shape[0],1))])
-            xori = np.hstack([x,np.ones((x_p.shape[0],1))])
-            L = vh[-1,:]
-            h = L.reshape((3,3))
+            fp = x
+            tp = x_p
+            m = numpy.mean(fp[:2], axis=1)
+            maxstd = numpy.max(numpy.std(fp[:2], axis=1)) + 1e-9
+            C1 = numpy.diag([1/maxstd, 1/maxstd, 1])
+            C1[0, 2] = -m[0] / maxstd
+            C1[1, 2] = -m[1] / maxstd
+            fp = numpy.dot(C1, fp.T)
+
+            # -to
+            m = numpy.mean(tp[:2], axis=1)
+            maxstd = numpy.max(numpy.std(tp[:2], axis=1)) + 1e-9
+            C2 = numpy.diag([1/maxstd, 1/maxstd, 1])
+            C2[0, 2] = -m[0] / maxstd
+            C2[1, 2] = -m[1] / maxstd
+            tp = numpy.dot(C2, tp.T)
+
+            correspondences_count = fp.shape[1]
+            A = numpy.zeros((2 * correspondences_count, 9))
+            for i in range(correspondences_count):
+                A[2 * i    ] = [-fp[0][i], -fp[1][i], -1, 0, 0, 0,
+                tp[0][i]  * fp[0][i], tp[0][i] * fp[1][i], tp[0][i]]
+                A[2 * i + 1] = [0, 0, 0, -fp[0][i], -fp[1][i], -1,
+                tp[1][i]  * fp[0][i], tp[1][i] * fp[1][i], tp[1][i]]
+
+            U, S, V = numpy.linalg.svd(A)
+            H = V[8].reshape((3, 3))
+
+            H = numpy.dot(numpy.linalg.inv(C2), numpy.dot(H, C1))
+            h = H/H[2,2]
             homo_x = np.matmul(h,kp2_coordinates.T)
-            k = np.linalg.norm(kp1_coordinates-homo_x.T,axis=1)<3
+            k = np.linalg.norm(kp1_coordinates-homo_x.T,axis=1)<PIXEL_ERROR_THRESHOLD
             if best_count<np.count_nonzero(k):
                 best_count = np.count_nonzero(k)
                 best_h = h
-    # print(best_count)
+            # return H / H[2, 2]
+
+
+
+    print(best_count)
     result = cv2.warpPerspective(img2,best_h,
     	(img1.shape[1] + img2.shape[1], img1.shape[0]))
+    plt.imsave("Homography.jpg",result)
     result[0:img1.shape[0],0:img2.shape[1]] = img1
+    plt.imsave("Result.jpg",result)
 
-    H,mask = cv2.findHomography(kp2_coordinates, kp1_coordinates, cv2.RANSAC,5.0)
+    H,mask = cv2.findHomography(kp2_coordinates, kp1_coordinates, cv2.RANSAC,PIXEL_ERROR_THRESHOLD)
     result1 = cv2.warpPerspective(img2,H,
     	(img1.shape[1] + img2.shape[1], img1.shape[0]))
     result1[0:img1.shape[0],0:img2.shape[1]] = img1
