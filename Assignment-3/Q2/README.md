@@ -18,3 +18,5 @@ Results are computed for image:
 ![img2.jpg](https://github.com/radonys/CV-Assignments/blob/master/Assignment-3/Q2/img2.jpg "Input Image")
 
 With height of sign post given as **1.65**, the results are shown below:
+
+![Q2_Result.png](https://github.com/radonys/CV-Assignments/blob/master/Assignment-3/Q2/Q2_Result.png "Output Image")
